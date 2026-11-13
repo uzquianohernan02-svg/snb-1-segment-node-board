@@ -1,0 +1,53 @@
+Qty,References,Value,Footprint,Manufacturer part (or equivalent),Fitted,Function
+1,C1,100uF 50V,CP_Radial_D10.0mm_P5.00mm,Panasonic EEU-FR1H101,All nodes,"Bulk input, damps cable-inductance ringing on hot-plug"
+4,C2 C3 C4 C5,2.2uF 100V,C_1812_4532Metric,TDK C4532X7R2A225M,All nodes,Input ceramic X7R
+1,C6,100nF 100V,C_0805_2012Metric,TDK C2012X7R2A104M,All nodes,VIN pin bypass
+1,C7,1nF,C_0603_1608Metric,"Any 0603 X7R ceramic, 50 V min",All nodes,UVLO filter
+1,C8,470pF C0G,C_0603_1608Metric,"Any 0603 C0G ceramic, 50 V min",All nodes,"CRAMP, C0G 5%"
+1,C9,100nF,C_0603_1608Metric,"Any 0603 X7R ceramic, 50 V min",All nodes,Soft start ~12 ms
+1,C10,3.9nF,C_0603_1608Metric,"Any 0603 X7R ceramic, 50 V min",All nodes,CCOMP (zero ~1.6 kHz)
+1,C11,56pF C0G,C_0603_1608Metric,"Any 0603 C0G ceramic, 50 V min",All nodes,CHF
+1,C12,1uF 25V,C_0805_2012Metric,TDK C2012X7R1E105K,All nodes,VCC decoupling
+1,C13,1uF 25V,C_0805_2012Metric,TDK C2012X7R1E105K,All nodes,Bootstrap capacitor
+1,C14,1nF 100V,C_0805_2012Metric,"Any 0805 X7R ceramic, 100 V min",All nodes,Snubber C (tune on bench)
+4,C15 C16 C17 C18,22uF 25V,C_1210_3225Metric,Murata GRM32ER71E226KE15,All nodes,Output ceramic X7R
+1,C19,220uF 25V,CP_Radial_D8.0mm_P3.50mm,Panasonic 25SVPF220M (OS-CON) or equiv. polymer,All nodes,"Output bulk polymer, ESR ~20 mOhm"
+1,C20,1uF 25V,C_0805_2012Metric,"Any 0805 X7R ceramic, 25 V min",Node 1 only,LDO input
+1,C21,1uF 25V,C_0805_2012Metric,"Any 0805 X7R ceramic, 25 V min",Node 1 only,LDO output
+1,C22,100nF,C_0603_1608Metric,"Any 0603 X7R ceramic, 50 V min",Node 1 only,U3 decoupling
+1,D1,BZT52C15,D_SOD-123,Nexperia BZT52C15,All nodes,"15 V gate-source clamp (K=VIN, A=gate)"
+1,D2,SMBJ33A,D_SMB,Littelfuse SMBJ33A,All nodes,"TVS 33 V standoff, ~53 V clamp (FETs rated 60 V)"
+1,D3,BAS21,SOT-23,Nexperia BAS21,All nodes,Bootstrap diode 250 V
+1,D4,GRN,LED_0805_2012Metric,Any 0805 green LED (2 mA),All nodes,12 V present
+1,D5,SM712,SOT-23,Semtech SM712.TCT,Node 1 only,RS-485 line TVS
+1,F1,4A T,Fuseholder_Cylinder-5x20mm_Schurter_0031_8201_Horizontal_Open,"Schurter 0031.8201 holder + 4 A time-lag 5x20 fuse, DC-rated >= 32 V",All nodes,Field-replaceable 4 A time-delay fuse (Rev 4 item 10)
+4,H1 H2 H3 H4,M3,MountingHole_3.2mm_M3,MountingHole_3.2mm_M3,Not a part (hole),"Mounting hole, not bonded (Class 2 output not earthed)"
+1,J1,24V IN,TerminalBlock_Phoenix_MKDS-3-2-5.08_1x02_P5.08mm_Horizontal,"Phoenix 1711026 (MKDS 3/2-5,08)",All nodes,"Terminal block 2p 5.08 mm, 24-12 AWG, 24 A"
+1,J2,RS485 IN,"TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal",Phoenix 1715734,Node 1 only,Twisted-pair data from controller TX
+1,J3,12V OUT A,TerminalBlock_Phoenix_MKDS-3-2-5.08_1x02_P5.08mm_Horizontal,Phoenix 1711026,All nodes,12 V to strip injection (start)
+1,J4,12V OUT B,TerminalBlock_Phoenix_MKDS-3-2-5.08_1x02_P5.08mm_Horizontal,Phoenix 1711026,All nodes,12 V to strip injection (mid/end)
+1,J5,DATA OUT,"TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal",Phoenix 1715734,Node 1 only,To strip DI / BI / GND
+1,JP1,TERM,SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm,SolderJumper-2_P1.3mm_Open_RoundedPad1.0x1.5mm,Node 1 only,Close to terminate (end of line)
+1,JP2,BI SEL,SolderJumper-3_P1.3mm_Open_RoundedPad1.0x1.5mm,SolderJumper-3_P1.3mm_Open_RoundedPad1.0x1.5mm,Node 1 only,Bridge 1-2 at assembly: BI = GND (default); 2-3: BI = DI
+1,L1,15uH,L_Coilcraft_XAL1010-XXX,Coilcraft XAL1010-153ME,All nodes,"15 uH, Isat >= 13 A, shielded"
+1,Q1,SQD50P06-15L,TO-252-2,Vishay SQD50P06-15L,All nodes,"P-MOSFET -60 V, reverse-polarity protection"
+1,Q2,Si7850DP,PowerPAK_SO-8_Single,Vishay Si7850DP,All nodes,High-side N-MOSFET 60 V
+1,Q3,Si7850DP,PowerPAK_SO-8_Single,Vishay Si7850DP,All nodes,Low-side N-MOSFET 60 V
+1,R1,10k,R_0805_2012Metric,"Any 0805 thick-film resistor, 1 %, 100 ppm/C",All nodes,P-FET gate pull-down
+1,R2,100k,R_0603_1608Metric,"Any 0603 thick-film resistor, 1 %, 100 ppm/C",All nodes,UVLO top (RUV2 > 500 x 60 V)
+1,R3,7.87k,R_0603_1608Metric,"Any 0603 thick-film resistor, 1 %, 100 ppm/C",All nodes,UVLO bottom: shutdown at ~16 V
+1,R4,12.4k,R_0603_1608Metric,"Any 0603 thick-film resistor, 1 %, 100 ppm/C",All nodes,RT: 250 kHz
+1,R5,100k,R_0603_1608Metric,"Any 0603 thick-film resistor, 1 %, 100 ppm/C",All nodes,EN pull-up to VIN (EN rated 100 V)
+1,R6,464k,R_0603_1608Metric,"Any 0603 thick-film resistor, 1 %, 100 ppm/C",All nodes,RRAMP to VCC (VOUT > 7.5 V slope comp)
+1,R7,1.24k 1%,R_0603_1608Metric,"Any 0603 thick-film resistor, 1 %, 100 ppm/C",All nodes,RFB1
+1,R8,11.0k 1%,R_0603_1608Metric,"Any 0603 thick-film resistor, 1 %, 100 ppm/C",All nodes,RFB2 -> VOUT = 11.99 V
+1,R9,26.1k,R_0603_1608Metric,"Any 0603 thick-film resistor, 1 %, 100 ppm/C",All nodes,RCOMP
+1,R10,10k,R_0603_1608Metric,"Any 0603 thick-film resistor, 1 %, 100 ppm/C",All nodes,RDEMB: fully synchronous after soft start
+1,R11,10m 1%,R_2010_5025Metric,IRC LRC-LRF2010-01-R010-F,All nodes,Current sense RS: limit 6.2 A min / 7.8 A typ
+1,R12,4.7,R_1206_3216Metric,"Any 1206 thick-film resistor, 1 %, 100 ppm/C",All nodes,Snubber R (tune on bench)
+1,R13,4.7k,R_0805_2012Metric,"Any 0805 thick-film resistor, 1 %, 100 ppm/C",All nodes,LED resistor (~2 mA)
+1,R14,120,R_0805_2012Metric,"Any 0805 thick-film resistor, 1 %, 100 ppm/C",Node 1 only,Line termination
+1,R15,33,R_0603_1608Metric,"Any 0603 thick-film resistor, 1 %, 100 ppm/C",Node 1 only,Data series resistor
+1,U1,LM5116MH,HTSSOP-20-1EP_4.4x6.5mm_P0.65mm_EP2.85x4mm,TI LM5116MHX/NOPB,All nodes,"Synchronous buck controller, 6-100 V"
+1,U2,L78L05,SOT-89-3,ST L78L05ABUTR,Node 1 only,5 V LDO for receiver
+1,U3,THVD1450DR,SOIC-8_3.9x4.9mm_P1.27mm,TI THVD1450DR (SOIC-8),Node 1 only,"RS-485 transceiver 50 Mbps, receive-only"

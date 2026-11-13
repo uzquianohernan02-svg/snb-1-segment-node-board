@@ -1,0 +1,8 @@
+{
+ "sch": "PASS",
+ "parity": "PASS (61 parts)",
+ "clearance": "PASS (0 violations)",
+ "edge": "PASS",
+ "conn": "PASS (30 nets)",
+ "court": "PASS"
+}

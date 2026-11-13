@@ -1,0 +1,12 @@
+# Client documents are kept out of the repository
+*.pdf
+*.docx
+!SNB-1_Segment_Node_Board_Design.pdf
+# Generated intermediates
+__pycache__/
+pcb/design/routed.pkl
+pcb/design/sch_draw.json
+pcb/design/preview*.pdf
+pcb/kicad/*-backups/
+pcb/kicad/*.kicad_prl
+pcb/kicad/fp-info-cache

@@ -1,0 +1,4 @@
+(sym_lib_table
+	(version 7)
+	(lib (name "snb")(type "KiCad")(uri "${KIPRJMOD}/snb.kicad_sym")(options "")(descr "Segment node board symbols"))
+)
