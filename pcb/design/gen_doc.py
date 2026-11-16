@@ -307,12 +307,12 @@ def build():
     st.append(P("SNB-1 Segment Node Board: Design Package, Rev A", H1))
     st.append(P("Per-segment power and data node for the WS2815 architectural lighting system of Engineering Specification "
                 "Rev 4. It replaces the separate fuse, 24 V-to-12 V converter and RS-485 pixel-data receiver at each segment "
-                "with one board in an IP67 enclosure. Prepared Nov 13, 2026.", BD))
+                "with one board in an IP67 enclosure. Prepared Nov 13, 2026; KiCad ERC/DRC clean-up Nov 16, 2026.", BD))
     st.append(Spacer(1, 5))
     warn = Table([[P("<b>Status: prototype design for engineering review, not yet built or tested.</b> Schematic-to-netlist "
-                     "parity, clearance (0.2 mm) and connectivity were checked with independent scripts (results in Section 10). "
-                     "KiCad's own ERC/DRC have <b>not</b> been run, because KiCad could not be installed on the design machine. "
-                     "Open the project in KiCad 9 or 10, refill zones (B), run ERC and DRC, and complete the bench tests in "
+                     "parity, clearance and connectivity were checked with independent scripts, and KiCad's own ERC and DRC "
+                     "(with schematic parity and zones refilled) report " + VER.get("kicad_erc", "n/a") + " and "
+                     + VER.get("kicad_drc", "n/a") + " (Section 10). Review the layout and complete the bench tests in "
                      "Section 10 before ordering production quantities. A custom board is not UL-listed (open item 6 of Rev 4).", SM)]],
                  colWidths=[colw])
     warn.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), WARN), ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#D08A2E")),
@@ -414,15 +414,17 @@ def build():
         ["Check", "Method", "Result"],
         ["Schematic matches netlist", "Connectivity re-derived from snb.kicad_sch (pins, wires, labels, power symbols)", v["sch"]],
         ["Schematic matches PCB", "Symbol UUID / value / footprint vs PCB footprint path / value / footprint", v["parity"]],
-        ["Copper clearance >= 0.2 mm", "Exact geometry, all pads, tracks, vias, polygons, pairwise", v["clearance"]],
+        ["Copper clearance 0.2 mm / Power 0.3 mm", "Exact geometry, all pads, tracks, vias, polygons, pairwise", v["clearance"]],
         ["Edge (0.5 mm) and hole clearance", "Exact geometry", v["edge"]],
         ["All nets connected", "Copper overlap graph; GND assumed joined by bottom plane", v["conn"]],
         ["Courtyards", "No overlaps between footprints", v["court"]],
-        ["KiCad ERC / DRC", "Not run: KiCad not installed on design machine", "<b>REQUIRED</b>"],
+        ["KiCad ERC", "kicad-cli " + VER.get("kicad_version", "") + " sch erc, all severities", VER.get("kicad_erc", "not run")],
+        ["KiCad DRC", "kicad-cli pcb drc, all severities, schematic parity, zones refilled; custom rule snb.kicad_dru "
+         "(0.2 mm at U1 0.65 mm pitch pads)", VER.get("kicad_drc", "not run")],
     ], [0.27 * colw, 0.50 * colw, 0.23 * colw]))
     st.append(P("Still required before production:", SMB))
     for t in [
-        "Open kicad/snb.kicad_pro in KiCad 9 or 10. Press B to fill the GND zones. Run ERC and DRC and fix anything reported.",
+        "Open kicad/snb.kicad_pro in KiCad 10 and review the layout. Re-run ERC/DRC after any manual change.",
         "Review the layout. Known compromises: (a) the HO gate-drive trace is about 25 mm long; shorten it in Rev B or add a 2.2 Ohm gate "
         "resistor footprint; (b) the input-capacitor GND returns to R11 through the bottom plane (about 12 mm). Keep that plane unbroken.",
         "Bench: soft start, line 18-30 V and load 0-6 A regulation; current limit (expect 6.2-9.4 A); switch-node ringing (tune R12/C14); "
@@ -437,7 +439,9 @@ def build():
         ["File", "Content"],
         ["pcb/kicad/snb.kicad_pro", "KiCad project (rules: 0.2 mm clearance, Power netclass 0.3 mm / 1.0 mm)"],
         ["pcb/kicad/snb.kicad_sch", "Schematic, 1 sheet A3, KiCad 9 format (opens in KiCad 9 and 10)"],
-        ["pcb/kicad/snb.kicad_pcb", "PCB, 2 layers, footprints embedded from the KiCad 9.0.9 library"],
+        ["pcb/kicad/snb.kicad_pcb", "PCB, 2 layers, zones filled, saved by KiCad 10 (needs KiCad 10)"],
+        ["pcb/kicad/snb.kicad_dru", "Custom design rule: 0.2 mm clearance at the LM5116 fine-pitch pads"],
+        ["pcb/kicad/snb-erc.json, snb-drc.json", "KiCad ERC and DRC reports"],
         ["pcb/kicad/snb.kicad_sym + sym-lib-table", "Project symbol library 'snb'"],
         ["pcb/kicad/snb_bom.csv", "Bill of materials with node-variant column"],
         ["pcb/design/*.py", "Generator scripts: netlist (single source of truth), router, checks, this document"],

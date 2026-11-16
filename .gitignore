@@ -10,3 +10,5 @@ pcb/design/preview*.pdf
 pcb/kicad/*-backups/
 pcb/kicad/*.kicad_prl
 pcb/kicad/fp-info-cache
+.history/
+pcb/kicad/.history/

@@ -69,12 +69,13 @@ class Router:
         H, W = X.shape
         blk = {L: np.zeros((H, W), bool) for L in LAYERS}
         vblk = np.zeros((H, W), bool)
-        inf_t = B.CLR + w / 2 + MARGIN
-        inf_v = B.CLR + VIA / 2 + MARGIN
         x0, y0, x1, y1 = i0 * G, j0 * G, i1 * G, j1 * G
         for it in self.items:
             if it.net == net or id(it) in extra_same:
                 continue
+            c = B.clr_for(net, it)
+            inf_t = c + w / 2 + MARGIN
+            inf_v = c + VIA / 2 + MARGIN
             bx = it.bbox
             if bx[0] > x1 + 1 or bx[2] < x0 - 1 or bx[1] > y1 + 1 or bx[3] < y0 - 1:
                 continue
@@ -107,7 +108,7 @@ class Router:
         out = set()
         i0, j0 = roi[0], roi[1]
         for it in items:
-            m = np.min([B.vdist(p, X, Y) for p in it.prims], axis=0) <= -0.0
+            m = np.min([B.vdist(p, X, Y) for p in (it.conn or it.prims)], axis=0) <= -0.0
             for L in it.layers:
                 ok = m & ~blk[L]
                 js, is_ = np.nonzero(ok)

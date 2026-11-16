@@ -1,0 +1,7 @@
+(version 1)
+
+# LM5116 HTSSOP-20 has 0.65 mm pitch (0.25 mm pad gap): its pads cannot meet the 0.3 mm Power
+# netclass clearance, so copper next to U1 pads is checked against the 0.2 mm default instead.
+(rule "U1 fine pitch"
+  (constraint clearance (min 0.2mm))
+  (condition "A.Type == 'Pad' && A.memberOfFootprint('U1')"))

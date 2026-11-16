@@ -9,6 +9,20 @@ BW, BH = 125.0, 85.0          # board size (mm)
 OX, OY = 100.0, 100.0         # board origin in KiCad sheet coordinates
 CLR = 0.2                     # default copper clearance
 EDGE = 0.5                    # copper-to-edge clearance
+CLR_POWER = 0.3               # 'Power' netclass clearance (written to snb.kicad_pro)
+POWER_NETS = ("VIN_RAW", "VIN_F", "VIN", "SW", "CS", "+12V")
+FINE_PITCH = ("U1",)          # 0.65 mm pitch: pads of these parts use CLR (custom rule in snb.kicad_dru)
+
+
+def clr_for(net, it):
+    """Required clearance between copper of `net` and item `it` (mirrors netclasses + snb.kicad_dru)."""
+    if it.kind == "pad" and it.ref in FINE_PITCH:
+        return CLR
+    return CLR_POWER if (net in POWER_NETS or it.net in POWER_NETS) else CLR
+
+
+def clr_pair(a, b):
+    return min(clr_for(a.net, b), clr_for(b.net, a))
 
 # ------------------------------------------------------------------ placement: ref -> (x, y, rot)
 PLACE = {
@@ -58,6 +72,7 @@ class Item:
     def __init__(self, net, layers, prims, kind, ref=None, pad=None, width=None, drill=None, hole=None):
         self.net, self.layers, self.prims, self.kind = net, set(layers), prims, kind
         self.ref, self.pad, self.width, self.drill, self.hole = ref, pad, width, drill, hole
+        self.conn = None              # copper a track end must land in (defaults to prims)
         xs, ys = [], []
         for p in prims:
             r = p[-1]
@@ -102,6 +117,7 @@ def pad_items(ref):
                 cu.add("F")
             elif l == "B.Cu":
                 cu.add("B")
+        conn = None
         dr = sexpr.find(pd, "drill")
         drill = float(dr[1]) if dr and len(dr) > 1 and not isinstance(dr[1], list) else None
         if ptype == "np_thru_hole":
@@ -142,10 +158,13 @@ def pad_items(ref):
                 bx = (min(xs) + max(xs)) / 2; by = (min(ys) + max(ys)) / 2
                 c2 = xf(px + bx, py + by, x, y, rot)
                 prims = rect_prims(c2[0], c2[1], max(xs) - min(xs), max(ys) - min(ys), ang)
+                conn = rect_prims(cx, cy, w, h, ang)   # land tracks on the anchor, not the bbox
         else:  # rect / trapezoid
             prims = rect_prims(cx, cy, w, h, ang)
         net = p["pins"].get(num, "") if num else ""
-        items.append(Item(net, cu, prims, "pad", ref=ref, pad=num, drill=drill))
+        it = Item(net, cu, prims, "pad", ref=ref, pad=num, drill=drill)
+        it.conn = conn
+        items.append(it)
     return items, holes
 
 

@@ -520,23 +520,23 @@
     "netclass_patterns": [
       {
         "netclass": "Power",
-        "pattern": "VIN_RAW"
+        "pattern": "/VIN_RAW"
       },
       {
         "netclass": "Power",
-        "pattern": "VIN_F"
+        "pattern": "/VIN_F"
       },
       {
         "netclass": "Power",
-        "pattern": "VIN"
+        "pattern": "/VIN"
       },
       {
         "netclass": "Power",
-        "pattern": "SW"
+        "pattern": "/SW"
       },
       {
         "netclass": "Power",
-        "pattern": "CS"
+        "pattern": "/CS"
       },
       {
         "netclass": "Power",

@@ -4,5 +4,8 @@
  "clearance": "PASS (0 violations)",
  "edge": "PASS",
  "conn": "PASS (30 nets)",
- "court": "PASS"
+ "court": "PASS",
+ "kicad_erc": "PASS (0 errors, 0 warnings)",
+ "kicad_drc": "PASS (0 errors, 0 warnings)",
+ "kicad_version": "10.0.8"
 }

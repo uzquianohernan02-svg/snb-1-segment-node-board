@@ -3,6 +3,7 @@ import json, os, pickle, sys, uuid
 import sexpr
 from sexpr import Sym, dump
 import board as B
+import silk
 import route as R
 from netlist import C, nets as netlist_nets
 
@@ -10,6 +11,25 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, "..", "kicad")
 NS = uuid.UUID("6f1c0a52-3c1e-4b7e-9d0e-5a1b2c3d4e5f")
 ROOT = str(uuid.uuid5(NS, "root-sheet"))
+
+
+POWER_SYMBOL_NETS = ("GND", "+12V", "+5V")   # nets named by power symbols; all others are local labels
+NC_PADS = {("D3", "2"): "unconnected-(D3-NC-Pad2)"}   # name KiCad gives a no-connect symbol pin
+KELVIN_PADS = {("U1", "13")}                         # CSG: Kelvin track only, no zone connection
+
+DRU = """(version 1)
+
+# LM5116 HTSSOP-20 has 0.65 mm pitch (0.25 mm pad gap): its pads cannot meet the 0.3 mm Power
+# netclass clearance, so copper next to U1 pads is checked against the 0.2 mm default instead.
+(rule "U1 fine pitch"
+  (constraint clearance (min 0.2mm))
+  (condition "A.Type == 'Pad' && A.memberOfFootprint('U1')"))
+"""
+
+
+def kname(net):
+    """Board net name exactly as KiCad derives it from the schematic."""
+    return net if (net in POWER_SYMBOL_NETS or net.startswith("unconnected-")) else "/" + net
 
 
 def uid(*k):
@@ -30,7 +50,7 @@ def verify(items, holes):
             if not (A.layers & Bi.layers) or (A.net == Bi.net and A.net):
                 continue
             d = B.item_dist(A, Bi)
-            if d < B.CLR - 0.005:
+            if d < B.clr_pair(A, Bi) - 0.005:
                 errs.append(f"clearance {d:.3f} mm: {desc(A)} <-> {desc(Bi)}")
     # 2. edge and hole clearance
     for it in items:
@@ -79,7 +99,7 @@ def K(x, y):
     return round(x + B.OX, 4), round(y + B.OY, 4)
 
 
-def fp_node(ref, netcode):
+def fp_node(ref, netcode, refpos):
     p = C[ref]
     x, y, rot = B.PLACE[ref]
     t = B.load_fp(p["fp"])
@@ -110,10 +130,20 @@ def fp_node(ref, netcode):
         if k == "property":
             if c[1] == "Reference":
                 c[2] = ref
+                bx, by, ang, size, layer = refpos
+                lx, ly = silk.board_coords_to_local(ref, bx, by)
+                sexpr.find(c, "at")[:] = [Sym("at"), lx, ly, ang]
+                sexpr.find(c, "layer")[:] = [Sym("layer"), layer]
+                fnt = sexpr.find(sexpr.find(c, "effects"), "font")
+                sexpr.find(fnt, "size")[:] = [Sym("size"), size, size]
+                if sexpr.find(fnt, "thickness"):
+                    sexpr.find(fnt, "thickness")[:] = [Sym("thickness"), 0.15 if size >= 1 else 0.12]
             elif c[1] == "Value":
                 c[2] = p["value"]
+            elif c[1] == "Description":
+                c[2] = p["desc"]
             at = sexpr.find(c, "at")
-            if at is not None:
+            if at is not None and c[1] != "Reference":
                 a = float(at[3]) if len(at) > 3 else 0.0
                 at[:] = [Sym("at"), at[1], at[2], (a + rot) % 360]
         elif k == "fp_text":
@@ -127,10 +157,13 @@ def fp_node(ref, netcode):
             at[:] = [Sym("at"), at[1], at[2]] + ([(a + rot) % 360] if (a + rot) % 360 else [])
             num = c[1]
             net = p["pins"].get(num, "") if num else ""
+            net = net or NC_PADS.get((ref, num), "")
+            if (ref, num) in KELVIN_PADS:
+                c.append([Sym("zone_connect"), 0])
             if net:
                 pos = next(i for i, q in enumerate(c) if isinstance(q, list) and q[0] == "uuid") \
                     if any(isinstance(q, list) and q[0] == "uuid" for q in c) else len(c)
-                c.insert(pos, [Sym("net"), netcode[net], net])
+                c.insert(pos, [Sym("net"), netcode[net], kname(net)])
             if not any(isinstance(q, list) and q[0] == "uuid" for q in c):
                 cnt[0] += 1
                 c.append([Sym("uuid"), uid("pad", ref, num, cnt[0])])
@@ -138,6 +171,14 @@ def fp_node(ref, netcode):
         if k == "property" and c[1] == "Value":
             node.append([Sym("property"), "Footprint", lib, [Sym("at"), 0, 0, rot], [Sym("layer"), "F.Fab"],
                          [Sym("hide"), Sym("yes")], [Sym("uuid"), uid("fpfp", ref)],
+                         [Sym("effects"), [Sym("font"), [Sym("size"), 1.27, 1.27], [Sym("thickness"), 0.15]]]])
+            node.append([Sym("property"), "Description", p["desc"], [Sym("at"), 0, 0, rot], [Sym("layer"), "F.Fab"],
+                         [Sym("hide"), Sym("yes")], [Sym("uuid"), uid("fpdesc", ref)],
+                         [Sym("effects"), [Sym("font"), [Sym("size"), 1.27, 1.27], [Sym("thickness"), 0.15]]]])
+            node.append([Sym("property"), "Fitted",
+                         "Node 1 only (RS-485 RX)" if p["variant"] == "RX" else "All nodes",
+                         [Sym("at"), 0, 0, rot], [Sym("layer"), "F.Fab"],
+                         [Sym("hide"), Sym("yes")], [Sym("uuid"), uid("fpfit", ref)],
                          [Sym("effects"), [Sym("font"), [Sym("size"), 1.27, 1.27], [Sym("thickness"), 0.15]]]])
             if p["mpn"]:
                 node.append([Sym("property"), "MPN", p["mpn"], [Sym("at"), 0, 0, rot], [Sym("layer"), "F.Fab"],
@@ -149,7 +190,7 @@ def fp_node(ref, netcode):
 
 def board_file(items, template):
     tpl = sexpr.parse(open(template, encoding="utf-8").read())
-    netnames = sorted({it.net for it in items if it.net} | set(netlist_nets()))
+    netnames = sorted({it.net for it in items if it.net} | set(netlist_nets()) | set(NC_PADS.values()))
     netnames = ["GND"] + [n for n in netnames if n != "GND"]
     netcode = {n: i + 1 for i, n in enumerate(netnames)}
     pcb = [Sym("kicad_pcb"), [Sym("version"), 20241229], [Sym("generator"), "pcbnew"],
@@ -179,18 +220,24 @@ def board_file(items, template):
                 [Sym("comment"), 2, "Prototype layout: refill zones (B) and run DRC in KiCad before fabrication"]])
     pcb.append([Sym("net"), 0, ""])
     for n in netnames:
-        pcb.append([Sym("net"), netcode[n], n])
+        pcb.append([Sym("net"), netcode[n], kname(n)])
+    # silkscreen labels
+    texts = [("SNB-1 Rev A  24V->12V 6A NODE", 30, 40, 1.5), ("24V IN", 3.2, 30.5, 1.0), ("RS-485 IN", 64.9, 72.6, 1.0),
+             ("12V OUT", 117.8, 37.5, 1.0), ("DATA OUT", 104.9, 72.6, 1.0),
+             ("A  B  GND", 64.9, 84.0, 0.9), ("GND BI DO", 104.9, 84.0, 0.9), ("+  -", 1.2, 19.5, 0.9)]
+    lay = silk.Layout()
+    texts = [(s, *lay.label(s, x, y, sz), sz) for s, x, y, sz in texts]
+    refpos = {ref: lay.reference(ref) for ref in sorted(C, key=lambda r: (B.courtyard(r) or (0, 0, 9, 9))[2] -
+                                                        (B.courtyard(r) or (0, 0, 0, 0))[0])}
+    fab = sorted(r for r, v in refpos.items() if v[4] == "F.Fab")
+    print(f"silk: {len(refpos) - len(fab)} designators on silkscreen, {len(fab)} on Fab only: {' '.join(fab)}")
     for ref in C:
-        pcb.append(fp_node(ref, netcode))
+        pcb.append(fp_node(ref, netcode, refpos[ref]))
     # board outline
     x0, y0 = K(0, 0); x1, y1 = K(B.BW, B.BH)
     pcb.append([Sym("gr_rect"), [Sym("start"), x0, y0], [Sym("end"), x1, y1],
                 [Sym("stroke"), [Sym("width"), 0.1], [Sym("type"), Sym("default")]], [Sym("fill"), Sym("no")],
                 [Sym("layer"), "Edge.Cuts"], [Sym("uuid"), uid("edge")]])
-    # silkscreen labels
-    texts = [("SNB-1 Rev A  24V->12V 6A NODE", 30, 40, 1.5), ("24V IN", 3.2, 30.5, 1.0), ("RS-485 IN", 64.9, 72.6, 1.0),
-             ("12V OUT", 117.8, 37.5, 1.0), ("DATA OUT", 104.9, 72.6, 1.0),
-             ("A  B  GND", 64.9, 84.0, 0.9), ("GND BI DO", 104.9, 84.0, 0.9), ("+  -", 1.2, 19.5, 0.9)]
     for i, (s, x, y, sz) in enumerate(texts):
         pcb.append([Sym("gr_text"), s, [Sym("at"), *K(x, y), 0], [Sym("layer"), "F.SilkS"], [Sym("uuid"), uid("txt", i)],
                     [Sym("effects"), [Sym("font"), [Sym("size"), sz, sz], [Sym("thickness"), 0.15]]]])
@@ -215,7 +262,7 @@ def board_file(items, template):
     m = 0.3
     pts = [K(m, m), K(B.BW - m, m), K(B.BW - m, B.BH - m), K(m, B.BH - m)]
     for L in ("B", "F"):
-        pcb.append([Sym("zone"), [Sym("net"), netcode["GND"]], [Sym("net_name"), "GND"], [Sym("layer"), f"{L}.Cu"],
+        pcb.append([Sym("zone"), [Sym("net"), netcode["GND"]], [Sym("net_name"), kname("GND")], [Sym("layer"), f"{L}.Cu"],
                     [Sym("uuid"), uid("zone", L)], [Sym("name"), f"GND_{L}"], [Sym("hatch"), Sym("edge"), 0.5],
                     [Sym("connect_pads"), [Sym("clearance"), 0.3]], [Sym("min_thickness"), 0.25],
                     [Sym("filled_areas_thickness"), Sym("no")],
@@ -231,12 +278,11 @@ def project_file(template):
     r.update(min_clearance=0.2, min_track_width=0.2, min_via_diameter=0.6, min_through_hole_diameter=0.3,
              min_copper_edge_clearance=0.5, min_hole_to_hole=0.25, min_via_annular_width=0.13)
     cls = d["net_settings"]["classes"][0]
-    cls.update(clearance=0.2, track_width=0.25, via_diameter=0.6, via_drill=0.3)
+    cls.update(clearance=B.CLR, track_width=0.25, via_diameter=0.6, via_drill=0.3)
     power = dict(cls)
-    power.update(name="Power", clearance=0.3, track_width=1.0, via_diameter=0.8, via_drill=0.4, priority=0)
+    power.update(name="Power", clearance=B.CLR_POWER, track_width=1.0, via_diameter=0.8, via_drill=0.4, priority=0)
     d["net_settings"]["classes"] = [cls, power]
-    d["net_settings"]["netclass_patterns"] = [{"netclass": "Power", "pattern": p} for p in
-                                              ("VIN_RAW", "VIN_F", "VIN", "SW", "CS", "+12V")]
+    d["net_settings"]["netclass_patterns"] = [{"netclass": "Power", "pattern": kname(p)} for p in B.POWER_NETS]
     d["meta"]["filename"] = "snb.kicad_pro"
     d["sheets"] = [[ROOT, "Root"]]
     d.setdefault("boards", [])
@@ -263,6 +309,7 @@ if __name__ == "__main__":
     open(os.path.join(OUT, "snb.kicad_pcb"), "w", encoding="utf-8", newline="\n").write(dump(pcb) + "\n")
     json.dump(project_file(os.path.join(tpl_dir, "ecc83-pp_v2.kicad_pro")),
               open(os.path.join(OUT, "snb.kicad_pro"), "w", encoding="utf-8"), indent=2)
+    open(os.path.join(OUT, "snb.kicad_dru"), "w", newline="\n").write(DRU)
     open(os.path.join(OUT, "sym-lib-table"), "w", newline="\n").write(
         '(sym_lib_table\n\t(version 7)\n\t(lib (name "snb")(type "KiCad")(uri "${KIPRJMOD}/snb.kicad_sym")'
         '(options "")(descr "Segment node board symbols"))\n)\n')

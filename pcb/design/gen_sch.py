@@ -151,7 +151,8 @@ def build():
                           X, Y, hide=True))
         pins = [pp[0] for pp in s["pins"]]
         items.append(instance("snb:" + p["sym"], ref, p["value"], X, Y, 0, pins, props,
-                              in_bom=(p["sym"] != "MountingHole") or True, fp=p["fp"]))
+                              in_bom=not (p["sym"] == "MountingHole" or p["sym"].startswith("SolderJumper")),
+                              fp=p["fp"]))
         draw.append(("sym", p["sym"], ref, p["value"], X, Y))
         done = set()
         for pp in s["pins"]:
