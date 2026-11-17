@@ -294,7 +294,7 @@ def build():
     def footer(c, d):
         c.saveState(); c.setFont("Helvetica", 7.5); c.setFillColor(colors.grey)
         c.drawString(16 * mm, 8 * mm, "SNB-1 Segment Node Board, Rev B (prototype design for review). Not PE-stamped, not UL-listed. "
-                                      "Basis: Engineering Specification Rev 4 + Engineer's Assumptions, Nov 13, 2026.")
+                                      "Basis: Engineering Specification Rev 5 (Final), Nov 17, 2026.")
         c.drawRightString(PW - 16 * mm, 8 * mm, f"Page {d.page}")
         c.restoreState()
 
@@ -306,14 +306,14 @@ def build():
     # ---------------- page 1-2: summary, requirements, calcs
     st.append(P("SNB-1 Segment Node Board: Design Package, Rev B", H1))
     st.append(P("Per-segment power and data node for the WS2815 architectural lighting system of Engineering Specification "
-                "Rev 4. It replaces the separate fuse, 24 V-to-12 V converter and RS-485 pixel-data receiver at each segment "
+                "Rev 5 (Final), where it is the specified per-segment converter (Spec Sec. 7). It replaces the separate fuse, 24 V-to-12 V converter and RS-485 pixel-data receiver at each segment "
                 "with one board in an IP67 enclosure. Prepared Nov 13, 2026; KiCad ERC/DRC clean-up Nov 16, 2026; Rev B (HO gate resistor R16, manufacturing files) Nov 17, 2026.", BD))
     st.append(Spacer(1, 5))
     warn = Table([[P("<b>Status: prototype design for engineering review, not yet built or tested.</b> Schematic-to-netlist "
                      "parity, clearance and connectivity were checked with independent scripts, and KiCad's own ERC and DRC "
                      "(with schematic parity and zones refilled) report " + VER.get("kicad_erc", "n/a") + " and "
                      + VER.get("kicad_drc", "n/a") + " (Section 10). Review the layout and complete the bench tests in "
-                     "Section 10 before ordering production quantities. A custom board is not UL-listed (open item 6 of Rev 4).", SM)]],
+                     "Section 10 before ordering production quantities. A custom board is not UL-listed (Spec Rev 5 Sec. 7.3, hold point H2).", SM)]],
                  colWidths=[colw])
     warn.setStyle(TableStyle([("BACKGROUND", (0, 0), (-1, -1), WARN), ("BOX", (0, 0), (-1, -1), 0.6, colors.HexColor("#D08A2E")),
                               ("LEFTPADDING", (0, 0), (-1, -1), 6), ("RIGHTPADDING", (0, 0), (-1, -1), 6),
@@ -325,9 +325,9 @@ def build():
     st.append(tbl([
         ["Requirement", "Source", "SNB-1 implementation"],
         ["24 V DC Class 2 input, 2.5 A per segment", "Spec Sec. 1, 2 (approved 24 V)", "J1, sized for 12-14 AWG pigtail; UVLO off at 16 V"],
-        ["4 A time-delay fuse at converter input", "Rev 4 open item 10 (approved)", "F1: 5x20 mm holder, 4 A T fuse, DC rating >= 32 V"],
+        ["4 A time-delay fuse at converter input", "Spec Rev 5, Sec. 2 item 10", "F1: 5x20 mm holder, 4 A T fuse, DC rating >= 32 V"],
         ["24 V to 12 V, >= 6 A / 72 W, IP67", "Spec Sec. 7", "LM5116 sync buck; 6.2 A min current limit; board in IP67 box"],
-        ["Converter at the segment, 12 V injection start/mid/end", "Spec Sec. 5A", "Two 12 V output terminals (J3, J4), 14 AWG min wiring"],
+        ["Converter at segment middle, 12 V injection at both ends and every 16 ft", "Spec Sec. 5A", "Two 12 V outputs (J3, J4), each feeding 2 injection points; 14 AWG, max 20 ft"],
         ["RS-485 receiver at first pixel; BI handling", "Spec Sec. 7", "U3 THVD1450 + JP2 (BI to GND default); node 1 only"],
         ["Remain Class 2; no paralleling; V+ isolated", "Spec Sec. 3", "One board per driver output; outputs never joined"],
         ["Common GND across segments, DC not earthed", "Spec Sec. 5", "GND continuous; mounting holes not connected"],
@@ -432,7 +432,7 @@ def build():
         "step-load transient (tune R9/C10); 150 ft hot-plug VIN overshoot (must stay < 50 V).",
         "Thermal: 12 V / 5 A for 2 h in the sealed IP67 box at 60 C ambient. Keep L1, Q2, Q3 and U1 below 105 C (thermocouples).",
         "Data: 720 pixels at 45 fps through 300 ft of Cat5e. Check for no flicker, and check the BI behaviour with JP2.",
-        "Compliance: a custom converter board is not UL-listed. Check with the AHJ (NEC 411.4) or plan UL recognition (Rev 4 items 6 and 13).",
+        "Compliance: a custom converter board is not UL-listed. Check with the AHJ (NEC 411.4) or plan UL listing (Spec Rev 5 Sec. 7.3, hold H2).",
     ]:
         st.append(P("&bull; " + t, SM))
     st.append(P("11. Files", H2))

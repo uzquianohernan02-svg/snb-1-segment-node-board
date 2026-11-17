@@ -20,7 +20,7 @@ Qty,References,Value,Footprint,Manufacturer part (or equivalent),Fitted,Function
 1,D3,BAS21,SOT-23,Nexperia BAS21,All nodes,Bootstrap diode 250 V
 1,D4,GRN,LED_0805_2012Metric,Any 0805 green LED (2 mA),All nodes,12 V present
 1,D5,SM712,SOT-23,Semtech SM712.TCT,Node 1 only,RS-485 line TVS
-1,F1,4A T,Fuseholder_Cylinder-5x20mm_Schurter_0031_8201_Horizontal_Open,"Schurter 0031.8201 holder + 4 A time-lag 5x20 fuse, DC-rated >= 32 V",All nodes,Field-replaceable 4 A time-delay fuse (Rev 4 item 10)
+1,F1,4A T,Fuseholder_Cylinder-5x20mm_Schurter_0031_8201_Horizontal_Open,"Schurter 0031.8201 holder + 4 A time-lag 5x20 fuse, DC-rated >= 32 V",All nodes,Field-replaceable 4 A time-delay fuse (Spec Rev 5 item 10)
 4,H1 H2 H3 H4,M3,MountingHole_3.2mm_M3,MountingHole_3.2mm_M3,Not a part (hole),"Mounting hole, not bonded (Class 2 output not earthed)"
 1,J1,24V IN,TerminalBlock_Phoenix_MKDS-3-2-5.08_1x02_P5.08mm_Horizontal,"Phoenix 1711026 (MKDS 3/2-5,08)",All nodes,"Terminal block 2p 5.08 mm, 24-12 AWG, 24 A"
 1,J2,RS485 IN,"TerminalBlock_Phoenix_MKDS-1,5-3-5.08_1x03_P5.08mm_Horizontal",Phoenix 1715734,Node 1 only,Twisted-pair data from controller TX

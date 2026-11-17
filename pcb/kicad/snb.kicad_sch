@@ -9,7 +9,7 @@
 		(date "2026-11-17")
 		(rev "B (prototype, not bench-tested)")
 		(company "Permanent Architectural LED Lighting Systems")
-		(comment 1 "Based on Engineering Specification Rev 4 + Engineer's Assumptions (Nov 13, 2026)")
+		(comment 1 "Based on Engineering Specification Rev 5 (Final, Nov 17, 2026)")
 		(comment 2 "Not PE-stamped. Not UL-listed. Requires bench verification before production.")
 	)
 	(lib_symbols
@@ -3919,7 +3919,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Field-replaceable 4 A time-delay fuse (Rev 4 item 10)"
+		(property "Description" "Field-replaceable 4 A time-delay fuse (Spec Rev 5 item 10)"
 			(at 59.69 44.45 0)
 			(effects
 				(font

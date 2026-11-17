@@ -7,6 +7,11 @@ receiver (TI THVD1450) for the first node of each WS2815 run.
 DRC (all severities, schematic parity, zones refilled) report 0 errors / 0 warnings; reports in
 `pcb/kicad/snb-erc.json` and `snb-drc.json`. Not UL-listed.
 
+System context: the SNB-1 is the specified per-segment converter and RS-485 receiver of the LED system
+Engineering Specification Rev 5 (Final, 2026-11-17), one board per 2.5 A Class 2 segment, 4 per 10 A run (1 x node1,
+3 x node2-4). Before first installation the spec requires 5 prototypes to pass the bench tests in the design PDF
+Sec. 10 (hold point H2).
+
 Rev B (2026-11-17): added R16, a 2.2 Ohm HO gate resistor at Q2, to damp the long gate-drive trace. Also added
 manufacturing outputs in `pcb/fab/`.
 

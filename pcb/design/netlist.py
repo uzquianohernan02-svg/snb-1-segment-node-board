@@ -26,7 +26,7 @@ part("J1", "24V IN", "Screw_Terminal_01x02",
 part("F1", "4A T", "Fuse",
      "Fuse:Fuseholder_Cylinder-5x20mm_Schurter_0031_8201_Horizontal_Open",
      {"1": "VIN_RAW", "2": "VIN_F"}, "Schurter 0031.8201 holder + 4 A time-lag 5x20 fuse, DC-rated >= 32 V",
-     "Field-replaceable 4 A time-delay fuse (Rev 4 item 10)", block="input")
+     "Field-replaceable 4 A time-delay fuse (Spec Rev 5 item 10)", block="input")
 part("Q1", "SQD50P06-15L", "Q_PMOS_GDS",
      "Package_TO_SOT_SMD:TO-252-2",
      {"1": "PG", "2": "VIN_F", "3": "VIN"}, "Vishay SQD50P06-15L",

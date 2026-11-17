@@ -221,7 +221,7 @@ def build():
            [Sym("title_block"), [Sym("title"), "Segment Node Board SNB-1: 24 V to 12 V / 6 A + RS-485 RX"],
             [Sym("date"), "2026-11-17"], [Sym("rev"), "B (prototype, not bench-tested)"],
             [Sym("company"), "Permanent Architectural LED Lighting Systems"],
-            [Sym("comment"), 1, "Based on Engineering Specification Rev 4 + Engineer's Assumptions (Nov 13, 2026)"],
+            [Sym("comment"), 1, "Based on Engineering Specification Rev 5 (Final, Nov 17, 2026)"],
             [Sym("comment"), 2, "Not PE-stamped. Not UL-listed. Requires bench verification before production."]],
            [Sym("lib_symbols")] + libs]
     sch += items
