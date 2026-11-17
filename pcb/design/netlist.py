@@ -93,7 +93,9 @@ part("C13", "1uF 25V", "C", "Capacitor_SMD:C_0805_2012Metric", {"1": "HB", "2": 
 # ------------------------------------------------------------------ POWER STAGE
 part("Q2", "Si7850DP", "Q_NMOS_PPAK",
      "Package_SO:PowerPAK_SO-8_Single",
-     {"1": "SW", "2": "SW", "3": "SW", "4": "HO", "5": "VIN"}, "Vishay Si7850DP", "High-side N-MOSFET 60 V", block="power")
+     {"1": "SW", "2": "SW", "3": "SW", "4": "HOG", "5": "VIN"}, "Vishay Si7850DP", "High-side N-MOSFET 60 V", block="power")
+part("R16", "2.2", "R", "Resistor_SMD:R_0603_1608Metric", {"1": "HOG", "2": "HO"},
+     "", "HO gate resistor at Q2 (damps long gate trace; 0-4.7 Ohm, tune on bench)", block="power")
 part("Q3", "Si7850DP", "Q_NMOS_PPAK",
      "Package_SO:PowerPAK_SO-8_Single",
      {"1": "CS", "2": "CS", "3": "CS", "4": "LO", "5": "SW"}, "Vishay Si7850DP", "Low-side N-MOSFET 60 V", block="power")

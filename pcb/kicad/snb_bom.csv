@@ -48,6 +48,7 @@ Qty,References,Value,Footprint,Manufacturer part (or equivalent),Fitted,Function
 1,R13,4.7k,R_0805_2012Metric,"Any 0805 thick-film resistor, 1 %, 100 ppm/C",All nodes,LED resistor (~2 mA)
 1,R14,120,R_0805_2012Metric,"Any 0805 thick-film resistor, 1 %, 100 ppm/C",Node 1 only,Line termination
 1,R15,33,R_0603_1608Metric,"Any 0603 thick-film resistor, 1 %, 100 ppm/C",Node 1 only,Data series resistor
+1,R16,2.2,R_0603_1608Metric,"Any 0603 thick-film resistor, 1 %, 100 ppm/C",All nodes,"HO gate resistor at Q2 (damps long gate trace; 0-4.7 Ohm, tune on bench)"
 1,U1,LM5116MH,HTSSOP-20-1EP_4.4x6.5mm_P0.65mm_EP2.85x4mm,TI LM5116MHX/NOPB,All nodes,"Synchronous buck controller, 6-100 V"
 1,U2,L78L05,SOT-89-3,ST L78L05ABUTR,Node 1 only,5 V LDO for receiver
 1,U3,THVD1450DR,SOIC-8_3.9x4.9mm_P1.27mm,TI THVD1450DR (SOIC-8),Node 1 only,"RS-485 transceiver 50 Mbps, receive-only"

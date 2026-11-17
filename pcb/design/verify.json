@@ -1,9 +1,9 @@
 {
  "sch": "PASS",
- "parity": "PASS (61 parts)",
+ "parity": "PASS (62 parts)",
  "clearance": "PASS (0 violations)",
  "edge": "PASS",
- "conn": "PASS (30 nets)",
+ "conn": "PASS (31 nets)",
  "court": "PASS",
  "kicad_erc": "PASS (0 errors, 0 warnings)",
  "kicad_drc": "PASS (0 errors, 0 warnings)",

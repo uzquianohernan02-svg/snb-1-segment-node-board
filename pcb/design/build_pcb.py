@@ -207,6 +207,9 @@ def board_file(items, template):
                     th[1] = 0.07           # 2 oz copper
                 if ly[1] == "dielectric 1":
                     sexpr.find(ly, "thickness")[1] = 1.43
+            # drill/place origin at the bottom-left board corner (fab files use it)
+            n = [e for e in n if not (isinstance(e, list) and e and e[0] in ("aux_axis_origin", "grid_origin"))]
+            n.append([Sym("aux_axis_origin"), B.OX, B.OY + B.BH])
         if k == "layers":
             for ly in n[1:]:
                 if ly[1] == "F.Cu":
@@ -214,15 +217,15 @@ def board_file(items, template):
                 if ly[1] == "B.Cu":
                     ly[:] = ly[:3]
         pcb.append(n)
-    pcb.append([Sym("title_block"), [Sym("title"), "Segment Node Board SNB-1"], [Sym("date"), "2026-11-13"],
-                [Sym("rev"), "A"], [Sym("company"), "Permanent Architectural LED Lighting Systems"],
+    pcb.append([Sym("title_block"), [Sym("title"), "Segment Node Board SNB-1"], [Sym("date"), "2026-11-17"],
+                [Sym("rev"), "B"], [Sym("company"), "Permanent Architectural LED Lighting Systems"],
                 [Sym("comment"), 1, "24 V Class 2 in -> 12 V / 6 A out + RS-485 receiver. 2 layers, 2 oz Cu, 1.6 mm FR4"],
-                [Sym("comment"), 2, "Prototype layout: refill zones (B) and run DRC in KiCad before fabrication"]])
+                [Sym("comment"), 2, "Rev B: R16 HO gate resistor; KiCad ERC/DRC clean; bench tests pending"]])
     pcb.append([Sym("net"), 0, ""])
     for n in netnames:
         pcb.append([Sym("net"), netcode[n], kname(n)])
     # silkscreen labels
-    texts = [("SNB-1 Rev A  24V->12V 6A NODE", 30, 40, 1.5), ("24V IN", 3.2, 30.5, 1.0), ("RS-485 IN", 64.9, 72.6, 1.0),
+    texts = [("SNB-1 Rev B  24V->12V 6A NODE", 30, 40, 1.5), ("24V IN", 3.2, 30.5, 1.0), ("RS-485 IN", 64.9, 72.6, 1.0),
              ("12V OUT", 117.8, 37.5, 1.0), ("DATA OUT", 104.9, 72.6, 1.0),
              ("A  B  GND", 64.9, 84.0, 0.9), ("GND BI DO", 104.9, 84.0, 0.9), ("+  -", 1.2, 19.5, 0.9)]
     lay = silk.Layout()

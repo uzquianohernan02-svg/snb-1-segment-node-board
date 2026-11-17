@@ -286,14 +286,14 @@ def build():
     PW, PH = landscape(A3)
     doc = BaseDocTemplate(OUTPDF, pagesize=landscape(A3), leftMargin=16 * mm, rightMargin=16 * mm,
                           topMargin=14 * mm, bottomMargin=14 * mm,
-                          title="SNB-1 Segment Node Board - Design Package Rev A",
+                          title="SNB-1 Segment Node Board - Design Package Rev B",
                           author="Engineering", subject="24 V to 12 V / 6 A node board with RS-485 receiver")
     fw, fh = PW - 32 * mm, PH - 28 * mm
     colw = (fw - 10 * mm) / 2
 
     def footer(c, d):
         c.saveState(); c.setFont("Helvetica", 7.5); c.setFillColor(colors.grey)
-        c.drawString(16 * mm, 8 * mm, "SNB-1 Segment Node Board, Rev A (prototype design for review). Not PE-stamped, not UL-listed. "
+        c.drawString(16 * mm, 8 * mm, "SNB-1 Segment Node Board, Rev B (prototype design for review). Not PE-stamped, not UL-listed. "
                                       "Basis: Engineering Specification Rev 4 + Engineer's Assumptions, Nov 13, 2026.")
         c.drawRightString(PW - 16 * mm, 8 * mm, f"Page {d.page}")
         c.restoreState()
@@ -304,10 +304,10 @@ def build():
     doc.addPageTemplates([two, one])
     st = []
     # ---------------- page 1-2: summary, requirements, calcs
-    st.append(P("SNB-1 Segment Node Board: Design Package, Rev A", H1))
+    st.append(P("SNB-1 Segment Node Board: Design Package, Rev B", H1))
     st.append(P("Per-segment power and data node for the WS2815 architectural lighting system of Engineering Specification "
                 "Rev 4. It replaces the separate fuse, 24 V-to-12 V converter and RS-485 pixel-data receiver at each segment "
-                "with one board in an IP67 enclosure. Prepared Nov 13, 2026; KiCad ERC/DRC clean-up Nov 16, 2026.", BD))
+                "with one board in an IP67 enclosure. Prepared Nov 13, 2026; KiCad ERC/DRC clean-up Nov 16, 2026; Rev B (HO gate resistor R16, manufacturing files) Nov 17, 2026.", BD))
     st.append(Spacer(1, 5))
     warn = Table([[P("<b>Status: prototype design for engineering review, not yet built or tested.</b> Schematic-to-netlist "
                      "parity, clearance and connectivity were checked with independent scripts, and KiCad's own ERC and DRC "
@@ -350,11 +350,12 @@ def build():
         ["3.11 Soft start", "tss = CSS x 1.215 V / 10 uA", "100 nF -> ~12 ms", "C9"],
         ["3.12 Loop compensation", "fc ~ 15 kHz; zero = 1/(2 pi RCOMP CCOMP)", "26.1 k + 3.9 nF (1.6 kHz), CHF 56 pF (109 kHz)", "R9, C10, C11"],
         ["3.13 Gate drive", "IGC = 2 Qg f = 2 x 14 nC x 252 kHz", "7 mA < 15 mA VCC limit (VCCX at GND)", "U1"],
+        ["3.13b HO gate resistor", "Damps trace L / Ciss ringing; t = Rg Qg / Vdrv", "2.2 Ohm adds ~5 ns; tune 0-4.7 Ohm", "R16"],
         ["3.14 Losses at 12 V / 5 A", "FETs 1.0 W, L1 0.5 W, RS 0.13 W, IC 0.2 W, Q1+F1 0.2 W", "~2.0 W total, ~96-97 % efficient", "-"],
         ["3.15 Output ripple", "Cout 4x22 uF + 220 uF polymer (~264 uF eff.)", "< 50 mV p-p (ESR dominated)", "C15-C19"],
     ]
     st.append(tbl(calc, [0.20 * colw, 0.38 * colw, 0.30 * colw, 0.12 * colw]))
-    st.append(P("Values marked for bench tuning: R9/C10/C11 (loop), R12/C14 (snubber). Confirm with TI WEBENCH or a Bode "
+    st.append(P("Values marked for bench tuning: R9/C10/C11 (loop), R12/C14 (snubber), R16 (HO gate). Confirm with TI WEBENCH or a Bode "
                 "measurement before production.", SM))
     st.append(P("4. Key component choices", H2))
     st.append(tbl([
@@ -425,9 +426,9 @@ def build():
     st.append(P("Still required before production:", SMB))
     for t in [
         "Open kicad/snb.kicad_pro in KiCad 10 and review the layout. Re-run ERC/DRC after any manual change.",
-        "Review the layout. Known compromises: (a) the HO gate-drive trace is about 25 mm long; shorten it in Rev B or add a 2.2 Ohm gate "
-        "resistor footprint; (b) the input-capacitor GND returns to R11 through the bottom plane (about 12 mm). Keep that plane unbroken.",
-        "Bench: soft start, line 18-30 V and load 0-6 A regulation; current limit (expect 6.2-9.4 A); switch-node ringing (tune R12/C14); "
+        "Review the layout. Known compromises: (a) the HO gate-drive trace is about 36 mm long (U1 sits below the power stage). Rev B adds R16, a 2.2 Ohm "
+        "gate resistor at the Q2 gate, to damp it. Moving U1 closer to Q2 is the Rev C option if HO ringing is seen on the bench; (b) the input-capacitor GND returns to R11 through the bottom plane (about 12 mm). Keep that plane unbroken.",
+        "Bench: soft start, line 18-30 V and load 0-6 A regulation; current limit (expect 6.2-9.4 A); switch-node and HO gate ringing (tune R12/C14 and R16); "
         "step-load transient (tune R9/C10); 150 ft hot-plug VIN overshoot (must stay < 50 V).",
         "Thermal: 12 V / 5 A for 2 h in the sealed IP67 box at 60 C ambient. Keep L1, Q2, Q3 and U1 below 105 C (thermocouples).",
         "Data: 720 pixels at 45 fps through 300 ft of Cat5e. Check for no flicker, and check the BI behaviour with JP2.",
@@ -444,6 +445,9 @@ def build():
         ["pcb/kicad/snb-erc.json, snb-drc.json", "KiCad ERC and DRC reports"],
         ["pcb/kicad/snb.kicad_sym + sym-lib-table", "Project symbol library 'snb'"],
         ["pcb/kicad/snb_bom.csv", "Bill of materials with node-variant column"],
+        ["pcb/fab/snb-gerbers.zip (+ gerbers/)", "Gerber X2 + Excellon drill files for the board house (drill map PDF in gerbers/)"],
+        ["pcb/fab/snb-pos-*.csv, snb-bom-*.csv", "Pick-and-place and assembly BOM per variant (node1 / node2-4)"],
+        ["pcb/fab/snb.step, snb-top.png", "3D model for the enclosure fit check; top render"],
         ["pcb/design/*.py", "Generator scripts: netlist (single source of truth), router, checks, this document"],
     ], [0.40 * colw, 0.60 * colw]))
     doc.build(st)
